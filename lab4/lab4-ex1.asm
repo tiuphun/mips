@@ -1,4 +1,15 @@
 # Laboratory Exercise 4, Home Assignment 1
+.data
+I:		.word		7
+J:		.word		1
+.text
+	# assign I, J
+	la 	    $t8, I
+	la 	    $t9, J
+	lw		$s1, 0($t8)         # I = s1
+	lw		$s2, 0($t9)         # J = s2
+	
+	# conditional
 start:
     slt     $t0, $s2, $s1       # j < i
     bne     $t0, $zero, else    # branch to else if j<i
