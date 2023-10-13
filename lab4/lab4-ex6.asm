@@ -30,8 +30,8 @@ loop:
     abs.d   $t2, $t1                # set t2 = abs(A[i])
 
     start:
-        slt     $t3, $s5, $t2           # A[i] > max ? t3 = 1 : t3 = 0
-        beq     $t3, $0, continue       # if A[i] < max, continue
-        add     $s5, $0, $t0            # set MAX to the current element (not its abs value)
+        slt     $t3, $s5, $t2       # A[i] > max ? t3 = 1 : t3 = 0
+        beq     $t3, $0, continue   # if A[i] < max, continue
+        add     $s5, $0, $t2        # set MAX = current element abs value
     continue:
-        bne     $s1, $s3, loop			# if i != n, goto loop
+        bne     $s1, $s3, loop		# if i != n, goto loop
