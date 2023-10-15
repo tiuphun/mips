@@ -27,7 +27,7 @@ loop:
     lw      $t0, 0($t1)        	 	# load value of A[i] in $t0
 
     # compare absolute values
-    abs.d   $t2, $t1                # set t2 = abs(A[i])
+    abs   $t2, $t1                # set t2 = abs(A[i])
 
     start:
         slt     $t3, $s5, $t2       # A[i] > max ? t3 = 1 : t3 = 0
