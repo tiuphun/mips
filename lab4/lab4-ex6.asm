@@ -32,6 +32,6 @@ loop:
     start:
         slt     $t3, $s5, $t2       # A[i] > max ? t3 = 1 : t3 = 0
         beq     $t3, $0, continue   # if A[i] < max, continue
-        add     $s5, $0, $t2        # set MAX = current element abs value
+        add     $s5, $0, $t2        # set MAX  = current element abs value
     continue:
         bne     $s1, $s3, loop		# if i != n, goto loop
