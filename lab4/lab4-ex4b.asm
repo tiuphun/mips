@@ -1,4 +1,4 @@
-# Laboratory Exercise 4, Assignment 4b
+# Laboratory Exercise 4,g Assignment 4b
 .data
 I:		.word		7
 J:		.word		1
