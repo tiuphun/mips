@@ -10,6 +10,7 @@
     header:     .asciiz         "\ni\t\tpower(2,i)\tsquare(i)\thex(i)\n"
     tab:        .asciiz         "\t\t"
     error:      .asciiz         "OVF\t\t"
+    input_err:  .asciiz         "\nInvalid input"
 .text
 .globl      main
 main:
@@ -23,13 +24,17 @@ main:
     syscall
     move        $s0, $v0        
     
-    # Print the table header
-    li          $v0, 4
-    la          $a0, header
-    syscall
+    # Check for valid input
+    blez        $s0, exit
+    nop
+    proceed:
+        # Print the table header
+        li          $v0, 4
+        la          $a0, header
+        syscall
 
-    # Call the subroutine
-    jal         print_table
+        # Call the subroutine
+        jal         print_table
 
 print_table:
     # Print i
@@ -148,3 +153,9 @@ hex:
     done:
         jr      $ra
 
+exit:
+        li          $v0, 4
+        la          $a0, input_err
+        syscall
+        li      $v0, 10
+        syscall
