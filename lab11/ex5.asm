@@ -1,8 +1,8 @@
-.eqv KEY_CODE   0xFFFF0004         # ASCII code from keyboard, 1 byte
-.eqv KEY_READY  0xFFFF0000         # =1 if has a new keycode ? Auto clear after lw
-.eqv DISPLAY_CODE 0xFFFF000C       # ASCII code to show, 1 byte
-.eqv DISPLAY_READY 0xFFFF0008      # =1 if the display has already to do. Auto clear after sw
-.eqv MASK_CAUSE_KEYBOARD 0x0000034 # Keyboard Cause
+.eqv KEY_CODE   			0xFFFF0004         	# ASCII code from keyboard, 1 byte
+.eqv KEY_READY  			0xFFFF0000         	# =1 if has a new keycode ? Auto clear after lw
+.eqv DISPLAY_CODE 			0xFFFF000C       	# ASCII code to show, 1 byte
+.eqv DISPLAY_READY 			0xFFFF0008      	# =1 if the display has already to do. Auto clear after sw
+.eqv MASK_CAUSE_KEYBOARD 	0x0000034 			# Keyboard Cause
 
 .text
     li   $k0,  KEY_CODE

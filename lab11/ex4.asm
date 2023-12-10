@@ -12,7 +12,7 @@ main:
     # Enable interrupts you expect 
     # Enable the interrupt of Keyboard matrix 4x4 of Digital Lab Sim
     li $t1, IN_ADRESS_HEXA_KEYBOARD
-    li $t3, 0x80 # bit 7 = 1 to enable 
+    li $t3, 0x80 								# bit 7 = 1 to enable 
     sb $t3, 0($t1)
     # Enable the interrupt of TimeCounter of Digital Lab Sim
     li $t1, COUNTER 
@@ -21,13 +21,11 @@ main:
 Loop:           nop
                 nop
                 nop
-sleep:          addi    $v0,$zero,32    # BUG: must sleep to wait for Time
-Counter:        li      $a0,200         # sleep 300 ms
+sleep:          addi    $v0,$zero,32    # BUG: must sleep to wait for Time Counter
+		        li      $a0, 200        # sleep 300 ms
                 syscall
                 nop
-                b       Loop
-    
-    # WARNING: nop is mandatory here.
+                b       Loop			# WARNING: nop is mandatory here.
 
 end_main:
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -44,23 +42,23 @@ dis_int:        li $t1, COUNTER       # BUG: must disable with Time Counter
 #--------------------------------------------------------
 # Processing
 #--------------------------------------------------------
-get_caus:       mfc0    $t1, $13         # $t1 = Coproc0.cause
+get_caus:       mfc0    $t1, $13         		# $t1 = Coproc0.cause
 IsCount:        li      $t2, MASK_CAUSE_COUNTER
-Counter:        and     $at, $t1,$t2      # if Cause value confirm
+Counter:        and     $at, $t1,$t2      		# if Cause value confirm
                 beq     $at,$t2, Counter_Intr
 IsKeyMa:        li      $t2, MASK_CAUSE_KEYMATRIX
-                and     $at, $t1,$t2      # if Cause value confirm Key..
+                and     $at, $t1,$t2      		# if Cause value confirm Key..
                 beq     $at,$t2, Keymatrix_Intr
-others:         j       end_process         # other cases
-Keymatrix_Intr: li      $v0, 4             # Processing Key Matrix Interrupt
+others:         j       end_process         	# other cases
+Keymatrix_Intr: li      $v0, 4             		# Processing Key Matrix Interrupt
                 la      $a0, msg_keypress
                 syscall
                 j       end_process
-Counter_Intr:   li      $v0, 4             # Processing Counter Interrupt
+Counter_Intr:   li      $v0, 4             		# Processing Counter Interrupt
                 la      $a0, msg_counter
                 syscall
                 j       end_process 
-end_process:    mtc0    $zero, $13       # Must clear cause reg 
+end_process:    mtc0    $zero, $13       		# Must clear cause reg 
 en_int:
                 # Re-enable interrupt
                 li $t1, COUNTER
@@ -70,7 +68,7 @@ en_int:
                 # epc <=epc+4
 next_pc:        mfc0 $at, $14 
                 addi $at, $at, 4    # $at <=  Coproc0.$14 = Coproc0.epc
-                         # $at = $at + 4   (next instruction)
-                         # Coproc0.$14 = Coproc0.epc <= $at
-return: 
-    eret                # Return from exception
+                         			# $at = $at + 4   (next instruction)
+                         			# Coproc0.$14 = Coproc0.epc <= $at
+                mtc0 $at, $14
+return:			eret                # Return from exception

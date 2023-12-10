@@ -13,9 +13,10 @@ main:
         li      $t3, 0x80                   # bit 7 = 1 to enable 
         sb      $t3, 0($t1)
         #--------------------------------------------------------- 
-        # Loop an print sequence numbers #---------------------------------------------------------
+        # Loop an print sequence numbers 
+        #---------------------------------------------------------
         xor     $s0,$s0,$s0                 # count = $s0 = 0
-Loop:   addi    $s0, $s0,                   # count = count + 1
+Loop:   addi    $s0, $s0, 1                 # count = count + 1
 prn_seq:addi    $v0,$zero,1
         add     $a0,$s0,$zero               # print auto sequence number
         syscall
@@ -91,5 +92,4 @@ restore:lw      $t3, 0($sp)      # Restore the registers from stack
         addi    $sp,$sp,-4
         lw      $ra, 0($sp)      # Restore the registers from stack
         addi    $sp,$sp,-4
-return: 
-    eret                # Return from exception
+return: eret                	# Return from exception

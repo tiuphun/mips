@@ -6,11 +6,12 @@ Message:    .asciiz     "Oh my god. Someone's presed a button.\n"
 .text
 main:
         #---------------------------------------------------------
-        # Enable interrupts you expect #---------------------------------------------------------
+        # Enable interrupts you expect 
+        #---------------------------------------------------------
         # Enable the interrupt of Keyboard matrix 4x4 of Digital Lab Sim
         li      $t1, IN_ADRESS_HEXA_KEYBOARD
-        li      $t3, 0x80 # bit 7 of = 1 to enable interrupt
-        sb      $t3,   0($t1)
+        li      $t3, 0x80 			# bit 7 of = 1 to enable interrupt
+        sb      $t3, 0($t1)
         #---------------------------------------------------------
         # No-end loop, main program, to demo the effective of interrupt
         #--------------------------------------------------------- 
@@ -22,7 +23,8 @@ Loop:   nop
 end_main:
 
 #---------------------------------------------------------------- 
-# GENERAL INTERRUPT SERVED ROUTINE for all interrupts #---------------------------------------------------------------- 
+# GENERAL INTERRUPT SERVED ROUTINE for all interrupts 
+#---------------------------------------------------------------- 
 .ktext  0x80000180
 
         #-------------------------------------------------------- 
