@@ -19,13 +19,11 @@ errMsg:     .asciiz     "Input string should have size as a multiple of 8. Pleas
 counter:	.word		1
 
 diskHeader: .asciiz     "Disk 1 \t\t Disk 2 \t\t Disk 3\n"
-border:     .asciiz     "---------------\t\t---------------\t\t---------------"
+border:     .asciiz     "---------------\t\t---------------\t\t---------------\n"
 newline:    .asciiz     "\n"
 tab:        .asciiz     "\t\t"
 
 .text
-.globl main
-main:
 #---------------------------------------------------------------------------
 # Get user input
 # param[in]
@@ -121,17 +119,33 @@ calcParityLoop: lb      $t6, 0($t1)
 # param[in]
 # return
 #---------------------------------------------------------------------------
-printDisk:  li      $v0, 4
+
+printDisk:  li      $v0, 4                      # print the table header
             la      $a0, diskHeader
             syscall
-
-            li      $t2, 4
+            li      $v0, 4                      # print the border
+            la      $a0, border
+            syscall
+            la      $t1, Disk1
+            la      $t2, Disk2
+            la      $t3, Disk3
+            li      $t4, 3
+printLoop:  lb      $t6, 0($t1)                 # check if there is any data left (in disk1, since data is multiple of 8)
+            beqz    $t6, printDone              
+            li      $t5, 4                      # print 4 bytes from current disk
 printByte:  lb      $a0, 0($t1)
             li      $v0, 1
             syscall
             addiu   $t1, $t1, 1
-            addiu   $t2, $t2, -1
+            addiu   $t5, $t5, -1
             bnez    $t2, printByte
             la      $a0, newline
             syscall
-            jr		$ra
+
+            addiu   $t4, $t4, -1
+            beqz    $t4, printDone
+            move    $t1, $t2
+            move    $t2, $t3
+            j       printLoop
+printDone:  li      $v0, 10
+            syscall
