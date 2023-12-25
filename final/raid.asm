@@ -18,7 +18,7 @@ input:      .space      256
 errMsg:     .asciiz     "Input string should have size as a multiple of 8. Please try again.\n"
 counter:	.word		1
 
-diskHeader: .asciiz     "Disk 1 \t\t Disk 2 \t\t Disk 3\n"
+diskHeader: .asciiz     "Disk 1 \t\t\tDisk 2 \t\t\tDisk 3\n"
 border:     .asciiz     "---------------\t\t---------------\t\t---------------\n"
 newline:    .asciiz     "\n"
 tab:        .asciiz     "\t\t"
@@ -42,7 +42,7 @@ readInput:  li      $v0, 8
 invalidInput: li    $v0, 4
             la      $a0, errMsg
             syscall
-            j       main
+            j       readInput
 strlen:     move    $t0, $a0            # load string addr
             li      $t1, 0              # init counter
 strlenLoop: lb      $t2, 0($t0)
@@ -82,7 +82,6 @@ parityD1:   la      $t1, Disk2
             la      $t3, Disk1          
             jal     calcParity
             j       nextTurn
-
 nextTurn:   addiu   $t0, $t0, 1
             sw      $t0, counter
             li      $t1, 4                  # if counter > 3, reset
@@ -138,7 +137,7 @@ printByte:  lb      $a0, 0($t1)
             syscall
             addiu   $t1, $t1, 1
             addiu   $t5, $t5, -1
-            bnez    $t2, printByte
+            bnez    $t5, printByte
             la      $a0, newline
             syscall
 
