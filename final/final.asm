@@ -30,34 +30,45 @@ newline:    .asciiz     "\n"
 prompt:     .asciiz     "Try again?"
 
 .text
-#---------------------------------------------------------------------------
-# Get user input
-# param[in]         $a0                 user input
-# return            $v0/ $t1            length of string
-#---------------------------------------------------------------------------
-readInput:  li      $v0, 8
+            la      $s1, Disk1
+            la      $s2, Disk2
+            la      $s3, Disk3
+            la      $a2, parity		
+getInput:   li      $v0, 8
             la      $a0, input
-            li      $a1, 256
+            li      $a1, 200
             syscall
-            la      $a0, input
-            jal     strlen
-            remu    $a1, $v0, 8
-            bnez    $a1, invalidInput
-            j       hex
-invalidInput: li    $v0, 4
-            la      $a0, errMsg
+            move    $s0, $a0		# s0 chua dia chi xau moi nhap
+            li      $v0, 4
+            la      $a0, diskHeader
             syscall
-            j       readInput
-strlen:     move    $t0, $a0            # load string addr
-            li      $t1, 0              # init counter
-strlenLoop: lb      $t2, 0($t0)
-            beqz    $t2, strlenEnd      # byte = 0 => end of string
-            addiu   $t0, $t0, 1         # goto next byte
-            addiu   $t1, $t1, 1         # increment the counter
-            j       strlenLoop
-strlenEnd:  addiu   $t1, $t1, -1        # exclude the count for null terminator 
-            move    $v0, $t1            # return length of str
-            jr		$ra				
+            li      $v0, 4
+            la      $a0, border
+            syscall
+	
+#-----------------------kiem tra do dai co chia het cho 8 khong--------------------------
+length:     addi    $t3, $zero, 0 	# t3 = length
+	        addi    $t0, $zero, 0 	# t0 = index
+
+check_char: add     $t1, $s0, $t0 	# t1 = address of string[i]
+	        lb      $t2, 0($t1) 		# t2 = string[i]
+	        nop
+	        beq     $t2, 10, test_length 	# t2 = '\n' ket thuc xau
+	        nop
+	        addi    $t3, $t3, 1 	# length++
+	        addi    $t0, $t0, 1	# index++
+	        j       check_char
+	        nop
+test_length: move   $t5, $t3
+	        and     $t1, $t3, 0x0000000f		# xoa het cac byte cua $t3 ve 0, chi giu lai byte cuoi
+	        bne     $t1, 0, test1			# byte cuoi bang 0 hoac 8 thi so chia het cho 8
+	        j       split1
+test1:	    beq     $t1, 8, split1
+	        j error1
+error1:	    li      $v0, 4
+	        la      $a0, errMsg
+	        syscall
+	        j       getInput
 
 #---------------------------------------------------------------------------
 # Calc parity
@@ -68,7 +79,7 @@ hex:        li      $t4, 7              # loop counter
 hexLoop:    blt     $t4, $0, endHex
             sll     $s6, $t4, 2         # s6 = t4 * 4 = {28, 24, 20...}
             srlv    $a0, $t8, $s6       # a0 = t8 >> s6
-            andi    $a0, $a0, 0x0f      # keep last byte of $a0
+            andi    $a0, $a0, 0x0000000f      # keep last byte of $a0
             la      $t7, hexChar
             add     $t7, $t7, $a0
             bgt     $t4, 1, continue
@@ -77,7 +88,7 @@ hexLoop:    blt     $t4, $0, endHex
             syscall
 continue:   addi    $t4, $t4, -1
             j       hexLoop
-endHex:     j		split1				
+endHex:     jr      $ra			
 				
 
 #-----------------------------------RAID 5 SIMULATION----------------------------------------
@@ -335,11 +346,11 @@ clear:	    la      $s0, input      # clear the input
 again:      sb      $t1, ($s0)		# set byte o dia chi s0 thanh 0
             nop
             addi    $s0, $s0, 1
-            bge     $s0, $s3, input
+            bge     $s0, $s3, getInput
             nop
             j       again
             nop
 
 #---------------------------------END OF PROGRAM------------------------------------------            
-terminate:  li  $v0, 10
+terminate:  li      $v0, 10
             syscall
