@@ -33,7 +33,7 @@ prompt:     .asciiz     "Try again?"
             la      $s1, Disk1
             la      $s2, Disk2
             la      $s3, Disk3
-            la      $a2, parity	
+            la      $a2, parity			# a2: parity array
 #---------------------------------------------------------------------------
 # Get user input & length check
 # param[in]         $a0                 user input
@@ -55,7 +55,7 @@ getInput:   li      $v0, 8
 length:     addi    $t3, $zero, 0 	    # t3 = length
 	        addi    $t0, $zero, 0 	    # t0 = index
 
-checkChar: add     $t1, $s0, $t0 	    # t1 = address of string[i]
+checkChar: 	add     $t1, $s0, $t0 	    # t1 = address of string[i]
 	        lb      $t2, 0($t1) 		# t2 = string[i]
 	        nop
 	        beq     $t2, 10, testLength # t2 = '\n' => done
@@ -67,7 +67,7 @@ checkChar: add     $t1, $s0, $t0 	    # t1 = address of string[i]
 testLength: move    $t5, $t3
 	        and     $t1, $t3, 0x0f      # only keep last byte
 	        bne     $t1, 0, valid			    
-	        j       split1
+	        j       split1				# if valid input, start the disk sim
 valid:	    beq     $t1, 8, split1      # if last byte = 0 or 8 => valid
 	        j       errLen
 errLen:	    li      $v0, 4
@@ -76,17 +76,17 @@ errLen:	    li      $v0, 4
 	        j       getInput
 
 #---------------------------------------------------------------------------
-# Calc parity
+# Calc & print parity
 # param[in]         
 # return
 #---------------------------------------------------------------------------
 hex:        li      $t4, 7              # loop counter
-hexLoop:    blt     $t4, $0, endHex
+hexLoop:    blt     $t4, $0, endHex		# done?
             sll     $s6, $t4, 2         # s6 = t4 * 4 = {28, 24, 20...}
             srlv    $a0, $t8, $s6       # a0 = t8 >> s6
             andi    $a0, $a0, 0x0f      # keep last byte of $a0
-            la      $t7, hexChar
-            add     $t7, $t7, $a0
+            la      $t7, hexChar		
+            add     $t7, $t7, $a0		# go to the hex char with offset a0
             bgt     $t4, 1, continue
             lb      $a0, 0($t7)         # print hex[a0]
             li      $v0, 11
@@ -104,7 +104,7 @@ endHex:     jr      $ra
 split1:     addi    $t0, $0, 0          # nb of byte will be printed
             addi    $t9, $0, 0
             addi    $t8, $0, 0
-            la      $s1, Disk1
+            la      $s1, Disk1			
             la      $s2, Disk2
             la      $a2, parity
             la      $s0, input
@@ -118,13 +118,13 @@ b21:        add     $s5, $s0, 4
             lb      $t2, ($s5)          # t2 = addr of Disk2's byte
             addi    $t3, $t3, -1
             sb      $t2, ($s2)
-b31:        xor     $a3, $t1, $t2
-            sw      $a3, ($a2)
-            addi    $a2, $a2, 4
-            addi    $t0, $t0, 1
-            addi    $s0, $s0, 1
-            addi    $s1, $s1, 1
-            addi    $s2, $s2, 1
+b31:        xor     $a3, $t1, $t2		# byte of Disk 3 is XOR of first 2 disks
+            sw      $a3, ($a2)			# store to parity array
+            addi    $a2, $a2, 4			# goto next location of parity
+            addi    $t0, $t0, 1			# index
+            addi    $s0, $s0, 1			# goto next byte of input string
+            addi    $s1, $s1, 1			# goto next byte of Disk1
+            addi    $s2, $s2, 1			# goto next byte of Disk2
             bgt     $t0, 3, reset
             j       b11
 reset:      la      $s1, Disk1
@@ -158,7 +158,7 @@ next12:     li      $v0, 4
             la      $a2, parity
             addi    $t9, $0, 0
 print14:    lb      $t8, ($a2)
-            jal     hex
+            jal     hex					# start printing the parity: go to hex routine
             li      $v0, 4
             la      $a0, comma
             syscall
@@ -211,7 +211,7 @@ print22:    lb      $a0, ($s1)
             addi    $t9, $t9, 1
             addi    $s1, $s1, 1
             bgt     $t9, 3, next21
-            j print22
+            j 		print22
 next21:	    li      $v0, 4
             la      $a0, midPipe
             syscall
@@ -341,7 +341,7 @@ exit:       li      $v0, 4
 ask:	    li      $v0, 50
             la      $a0, prompt
             syscall
-            beq     $a0, 0, clear
+            beq     $a0, 0, clear	
             nop
             j       terminate
             nop
